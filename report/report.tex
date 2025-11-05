@@ -1,0 +1,268 @@
+% !TEX root = report.tex 
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{authblk}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
+\usepackage[backend=biber,style=numeric,url=true,doi=false,isbn=false]{biblatex}
+\usepackage{amsmath}
+\usepackage{float}
+
+\addbibresource{references.bib} 
+
+\author{Tanja Matura (01307001), Fausto, Stephan}
+\date{\today}
+\title{My First LaTeX Document}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+Hello, world! This is a simple \LaTeX{} document compiled in VS Code.
+
+\section{Data Set 1: Credit Score}
+
+The first data set we looked at is the \texttt{analcatdata\_creditscore} dataset from OpenML\cite{openml_creditscore}. 
+The dataset comes from the book `Analyzing Categorical Data', by Jeffrey S. Simonoff, Springer-Verlag, New York, 2003 \cite{Simonoff2003} and provides data about the credit score of 100 people.
+A more detailed look at the columns is given in the next section. 
+
+Our goal will be to predict whether someone's credit application will be approved based on information about them. For this we will 
+use logistic regression, a decision tree and a support vector machine. A comparison of results can be found in 2.6 Summary.
+
+\subsection{Overview}
+
+The dataset is small with only 7 columns and 100 entries. All features are numeric, although \texttt{Derogatory.reports}
+represents an ordinal variable. The target is Application.accepted, a binary variable that indicates whether someone's credit 
+application was approved or denied. 
+This table gives an overview over the features and the target: 
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Feature} & \textbf{Types} & \textbf{Observation}\\
+\midrule
+\small Age & \small Numeric (Integer) & \small Range 20-55, mean~32\\
+\small \texttt{Income.per.dependent} & \small Numeric (Integer) & \small \\
+\small \texttt{Monthly.credit.card.exp} & \small Numeric (Integer) & \small Range 0-1898, mean~189\\
+\small Own.home & \small Categorial (Boolean) & \small 64 Yes, 36 No\\
+\small \texttt{Self.employed} & \small Categorial (Boolean) & \small 5 Yes, 95 No\\
+\small Derogatory.reports & \small Numeric (Integer) & \small Range 0-7\\
+\small \textbf{Application.accepted} & \small Categorial (Boolean) & \small 73 Yes, 27 No\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+It is notable that \textbf{the target variable is skewed}, with 73 being accepted and 27 rejected.
+This is even more true for self.employed (5 yes to 95 no). 
+\texttt{Monthly.credit.card.exp} also seems to contain extreme values, with the range being 0-1898 with 
+a mean of only 189. We will take a look at this outlier later.
+
+A look at the first few rows of the dataset: 
+
+\includegraphics[width=0.9\textwidth]{img/credit_score_head.png}
+
+\texttt{Monthly.credit.card.exp} already shows high variance in this snippet and is a candidate for transformation later. 
+
+The categorical columns - that are binary and therefore encoded as "0" and "1" - and \texttt{Derogatory.reports} are still byte enconded and had to be 
+decoded first before they could be worked with.
+
+\subsubsection{Feature Distribution (Numeric)}
+
+Target based distribution of numeric features: 
+
+\includegraphics[width=0.9\textwidth]{img/credit_score_featureDistributionTarget.png}
+
+The bar plots show some extreme values for \texttt{Monthly.credit.card.exp} and \texttt{Derogatory.reports}. However, neither 
+seem to be unrealistic and therefore not errors in the data set but real extreme values. 
+
+Something else that stands out is that both of these features seem to be highly correlated with the target variable - the application of people with high monthly expenses
+were accepted, while the applications of people with more than two derogatory reports were rejected. To reduce the influence on the prediction we will transform these features before fitting a model (see Pre-Processing).
+
+\texttt{Age} and \texttt{Income.per.dependent} also show right skewing and might be transformed later.
+
+\subsubsection{Feature Distribution (Binary)}
+Target based distribution of binary features: 
+
+\includegraphics[width=0.9\textwidth]{img/credit_score_binaryDistributionTarget.png}
+
+The plots for the binary features show that the \texttt{Self.employed} feature is very unevenely distributed - there ist almost 
+no data for people who are self-employed. Their application rate also goes against the trend, with more applications rejected 
+than accepted. 
+
+\subsection{Data cleaning and pre-processing}
+
+After gaining a better understanding of the data we are working with, we prepared the data to be suitable for model fitting. 
+
+\begin{description}
+  \item[Byte-Decoding:] As seen in the first five rows of the dataset, some columns were still byte-encoded after importing the .arff file and had to be decoded first.
+  \item[Missing Values:] The Credit Score Dataset is complete and therefore didn't need any handling of missing values.
+  \item[Normalization of Binary Features:] To make sure no entry is missed during conversion (in case some binary features aren't encoded as 0 or 1) we searched the columns
+  for subsets of "Yes", "No", "True" and "False" and converted them to 0 and 1, should any be found. 
+  \item[Conversion of Numeric Values:] All numeric values in the dataset were converted from String to ensure later calculations work. For this the pandas function 
+  \texttt{pd.to\_numeric} was used, which detects and converts numeric Strings automatically.
+  \item[Outlier Handling:] Some rows contain extreme values. At first we considered to keep them, however after beginning to work with the dataset an issue arose: 
+  Even after log transforming \texttt{Monthly.credit.card.exp} correlated so strongly with the target that it essentially encoded the same information - leading to unrealistic 0\% prediction error 
+  in the first attempts using Logistic Regression.
+
+  Visual diagnostics confirmed that this feature is dominating the others. 
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{img/credit_score_featureImportance.png}
+  \end{figure}
+
+  To reduce the influence of \texttt{Monthly.credit.card.exp} we decided to cap the column. For this we used the IQR: The upper treshold turned out to be 632.01 and 6
+  rows needed to be capped at this value. After capping the extreme values in \texttt{Monthly.credit.card.exp}, the performance of the Logistic Regression model decreased 
+  from 100\% accuracy to a more credible level of 85\%.
+
+  \item[Transformation of Numeric Values:]
+  Instead of relying on visuals only we used the function \texttt{skew()} to output the skewness of each numeric feature.
+  Features with $|\text{skew}| > 1$ were considered strongly skewed. This applied to \texttt{Monthly.credit.card.exp}
+  and to \texttt{Income.per.dependent}. 
+  
+  After log transformation the features changed as followed: 
+
+  \begin{table}[H]
+  \centering
+  \begin{tabular}{lcc}
+  \toprule
+  \textbf{Feature} & \textbf{Skewdness before} & \textbf{Skewdness after} \\
+  \midrule
+  \texttt{Income.per.dependent}  & 1.882 &  0.800 \\
+  \texttt{Monthly.credit.card.exp} & 1.220 & -0.586 \\
+  \bottomrule
+  \end{tabular}
+  \end{table}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{img/credit_score_expensesLog.png}
+  \end{figure}
+
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{img/credit_score_incomeLog.png}
+  \end{figure}
+
+  \item[Scaling of Numeric Values:] Numeric features were scaled using RobustScaler to mitigate the influence of remaining outliers.
+  \item[Class Balance of Binary Features:] Our binary columns (including the target) show class imbalance.
+  Features were kept as they are, the imbalance of the target will be adressed by using \texttt{class\_weight='balanced'} during model fitting. 
+  \item[Training- and Test-Split:] 80:20
+\end{description}
+
+
+\subsection{Logistic Regression (m1a)}
+As baseline model, we first trained a Logistic Regression classifier to predict \texttt{Application.accepted}.
+Logistic Regression is well-suited for this dataset because the target variable, Application.accepted, is binary (approved vs. rejected), 
+which fits the model`s purpose of predicting probabilities for categorical outcomes.
+
+Since the target variable was moderately imbalanced (approximately 1:3 ratio), two balancing strategies were compared:
+First, assigning class weights inversely proportional to class frequency (\texttt{class\_weight='balanced'}), and
+second, random oversampling of the minority class to equalize class counts.
+
+As discussed earlier the model achieved 100\% accuracy on the training set before Monthly.credit.card.exp was capped.
+After capping  and re-fitting the model, performance metrics became more realistic.
+
+Both balancing methods produced identical results, with the model achieving an overall accuracy of 85\%.
+The recall for rejected applications (Class 0) remained perfect, indicating no false negatives,
+while the recall for accepted applications (Class 1) slightly decreased to 0.8, suggesting more realistic model behavior.
+
+These results confirm that outlier capping effectively reduced the excessive influence of \texttt{Monthly.credit.card.exp}
+without removing its predictive contribution.
+The model now generalizes better and provides a more balanced interpretation of multiple predictors rather than relying on a single dominating feature.
+
+Cross Validation
+
+Since we established that the target variable is imbalanced we chose Stratified K-Fold cross-validation. Working with a small dataset also meant that 
+we should keep k small, so the validation sets won't become too small.
+
+Mean Accuracy: 0.970 ± 0.024 \\
+Mean F1 Score: 0.964 ± 0.030
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lc}
+\toprule
+\textbf{Metric} & \textbf{Results} \\
+\midrule
+CV & 0.970 \\
+SD & 0.024 \\
+Macro F1 & 0.83 \\
+Recall (Class 0) & 1.00\\
+Recall (Class 1) & 0.80 \\
+Recall (Class 1) & 0.80 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Decision Tree (m1b)}
+
+The second model we trained was a decision tree. In contrast to Logistic Regression, which assumes a linear relationship between predictors and the log-odds of the target, a Decision Tree partitions the feature space recursively into regions that are more homogeneous with respect to the target variable.
+However, since the dataset is relatively small (only 100 samples), trees can easily overfit if left unpruned. Therefore, we limited the depth and minimum number of samples per leaf to help ensure better generalization.
+
+Even with this the tree achieved a perfect prediction score on it's first run - but later cross validation showed that the model does not always predict with perfect accuracy, suggesting that the training and test data split happend to make the dataset perfectly separable. This is again due to the 
+variable \texttt{Monthly.credit.card.exp}. All applications that were rejected did not have any expenses, making it a very strong predictor for a tree (if expenses 0 => reject). However, some people without expenses still received a positive application result, which means the feature 
+cannot be deterministic factor and the model should not achieve 100\% accuracy. 
+
+Cross Validation 
+
+Mean Accuracy: 0.98 ± 0.024
+Mean F1 Score: 0.976 ± 0.029
+
+\subsection{Support Vector Machine (m1c)}
+
+The third model that was trained for the Credit Score Dataset was a support vecotr machine. A Support Vector Machine (SVM) is a supervised learning algorithm that tries to find the optimal separating boundary (hyperplane) between classes.
+Instead of just any line that separates accepted and rejected applications, it chooses the one that maximizes the margin — the distance between the boundary and the nearest data points from each class (called support vectors).
+This makes it robust to noise and reduces overfitting, especially in small datasets. Its margin-based approach makes it more generalizable than a Decision Tree and more flexible than Logistic Regression when the separation between classes is not perfectly linear.
+
+The SVM performed well overall but didn’t reach the near-perfect performance of the Decision Tree.
+
+With class weights, accuracy was 80%, and the minority class (rejected applications) had a lower precision (0.56), indicating some misclassifications.
+
+With oversampling, performance improved to 90% accuracy and a macro F1 of 0.88, showing better class balance.
+
+Cross-validation confirmed consistent generalization with
+Mean Accuracy: 0.88 ± 0.05
+Mean F1: 0.86 ± 0.06
+
+\subsection{Summary}
+While the Decision Tree achieved perfect training accuracy, this performance likely reflects overfitting to the small dataset.
+In contrast, Logistic Regression produced slightly lower but more realistic results, maintaining good accuracy while capturing the main relationship between Monthly.credit.card.exp and the target without memorizing individual samples.
+The SVM shows strong but not perfect generalization — less prone to overfitting than the Decision Tree and slightly more flexible than Logistic Regression.
+
+\section{Data Set 2: Vehicle}
+\subsection{Overview}
+\subsection{Pre-processing}
+\subsection{Algorithm 1}
+\subsection{Algorithm 2}
+\subsection{Algorithm 3}
+\subsection{Summary}
+
+\section{Data Set 3}
+\subsection{Overview}
+\subsection{Pre-processing}
+\subsection{Algorithm 1}
+\subsection{Algorithm 2}
+\subsection{Algorithm 3}
+\subsection{Summary}
+
+\section{Data Set 4}
+\subsection{Overview}
+\subsection{Pre-processing}
+\subsection{Algorithm 1}
+\subsection{Algorithm 2}
+\subsection{Algorithm 3}
+\subsection{Summary}
+
+\section{Summary}
+
+
+\printbibliography
+\end{document}
