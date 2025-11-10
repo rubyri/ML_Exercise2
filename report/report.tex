@@ -5,6 +5,7 @@
 \documentclass{article}
 
 % Packages
+\usepackage{multirow}
 \usepackage[utf8]{inputenc}
 \usepackage{authblk}
 \usepackage{graphicx}
@@ -20,6 +21,7 @@
 \usepackage{amssymb}
 \usepackage{siunitx}
 \addbibresource{references.bib}
+
 
 % Layout
 \usepackage[a4paper,margin=3.5cm]{geometry}
@@ -41,8 +43,9 @@ Group38 \\
 \setcounter{tocdepth}{1}
 
 \section{Introduction}
-To ensure consistent and comparable evaluation across all four datasets, three complementary classification algorithms were selected:
-
+The task of this exercise is to evaluate 3 models on 4 diverse datasets, two
+of which were provided via Kaggle and 2 that our team selected. The 3
+chosen classifiers are:
 \begin{itemize}
   \item \textbf{Logistic Regression (ElasticNet):} A linear model that estimates class probabilities using a logistic function. ElasticNet regularization combines L1 (Lasso) and L2 (Ridge) penalties to balance feature selection and stability. It serves as a strong and interpretable baseline.
   \item \textbf{Decision Tree:} A non-parametric model that recursively splits the feature space into homogeneous regions. It captures nonlinear interactions, is interpretable, and robust to mixed data types, though it may overfit small datasets without pruning.
@@ -50,18 +53,17 @@ To ensure consistent and comparable evaluation across all four datasets, three c
 \end{itemize}
 
 This combination allows for evaluation of three distinct learning paradigms: linear, tree-based, and margin-based approaches.
-
-To ensure reproducibility random seed was fixed to 42.
-
 More models might be included in the section of a dataset, if they were also tested on the data.
 An Overview of the results can be found in Section ``summary''.
+
+To ensure reproducibility random seed was fixed to 42.
 
 % ------------------------------------------------------------------------
 
 \section{Dataset 1: Credit Score}
 
 The first data set we looked at is the \texttt{analcatdata\_creditscore} dataset from OpenML\cite{openml_creditscore}.
-The dataset comes from the book `Analyzing Categorical Data', by Jeffrey S. Simonoff, Springer-Verlag, New York, 2003\cite{Simonoff2003} and provides data about the credit score of 100 people.
+The dataset comes from the book `Analyzing Categorical Data', by Jeffrey S. Simonoff, Springer-Verlag, New York, 2003\cite{Simonoff2003} and provides data about the Credit Score of 100 people.
 A more detailed look at the columns is given in the next section.
 
 Our goal is to predict whether someone's credit application will be approved based on information about them. For this we will
@@ -84,10 +86,10 @@ This table gives an overview over the features and the target:
 \small \texttt{Age} & \small Numeric (Integer) & \small Range 20-55, mean~32\\
 \small \texttt{Income.per.dependent} & \small Numeric (Integer) & \small \\
 \small \texttt{Monthly.credit.card.exp} & \small Numeric (Integer) & \small Range 0-1898, mean~189\\
-\small \texttt{Own.home} & \small Categorial (Boolean) & \small 64 Yes, 36 No\\
-\small \texttt{Self.employed} & \small Categorial (Boolean) & \small 5 Yes, 95 No\\
+\small \texttt{Own.home} & \small Categorical (Boolean) & \small 64 Yes, 36 No\\
+\small \texttt{Self.employed} & \small Categorical (Boolean) & \small 5 Yes, 95 No\\
 \small \texttt{Derogatory.reports} & \small Numeric (Integer) & \small Range 0-7\\
-\small \textbf{Application.accepted} & \small Categorial (Boolean) & \small 73 Yes, 27 No\\
+\small \textbf{Application.accepted} & \small Categorical (Boolean) & \small 73 Yes, 27 No\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -121,7 +123,7 @@ Target based distribution of binary features:
 
 \includegraphics[width=0.9\textwidth]{img/credit_score_binaryDistributionTarget}
 
-The plots for the binary features show that the \texttt{Self.employed} feature is very unevenely distributed - there ist almost
+The plots for the binary features show that the \texttt{Self.employed} feature is very unevenly distributed - there is almost
 no data for people who are self-employed. Their application rate also goes against the trend, with more applications rejected
 than accepted.
 
@@ -130,7 +132,7 @@ than accepted.
 After gaining a better understanding of the data we are working with, we prepared the data to be suitable for model fitting.
 
 \begin{description}
-  \item[Byte-Decoding:] Some columns were still byte-encoded after importing the .arff file and had to be decoded first.
+  \item[Byte Decoding:] Some columns were still byte-encoded after importing the .arff file and had to be decoded first.
   \item[Missing Values:] The Credit Score Dataset is complete and therefore didn't need any handling of missing values.
   \item[Normalization of Binary Features:] To make sure no entry is missed during conversion (in case some binary features aren't encoded as 0 or 1) we searched the columns
   for subsets of \texttt{Yes}, \texttt{No}, \texttt{True} and \texttt{False} and converted them to 0 and 1, should any be found.
@@ -223,7 +225,7 @@ The SVM performed well overall but didn’t reach the near-perfect performance o
 
 With class weights, accuracy was 80\%, and the minority class (rejected applications) had a lower precision (0.56), indicating some misclassifications.
 
-With oversampling, performance improved to 90\% accuracy and a macro F1 of 0.88, showing better class balance.
+With oversampling, performance improved to 90\% accuracy and a macro-F1 of 0.88, showing better class balance.
 
 \subsection{Summary}
 
@@ -234,20 +236,20 @@ we should keep k small, so the validation sets won't become too small.
 \centering
 \begin{tabular}{lcc}
 \toprule
-\textbf{Model} & \textbf{Accuracy (CV)} & \textbf{Macro F1 (CV)} \\
+\textbf{Model} & \textbf{Accuracy (CV)} & \textbf{macro-F1 (CV)} \\
 \midrule
 Logistic Regression & 0.970 $\pm$ 0.024 & 0.964 $\pm$ 0.030 \\
 Decision Tree        & 0.980 $\pm$ 0.024 & 0.976 $\pm$ 0.029 \\
 SVM                  & 0.880 $\pm$ 0.050 & 0.860 $\pm$ 0.060 \\
 \bottomrule
 \end{tabular}
-\caption{Cross-validation results for the Credit Score dataset.}
+\caption{Performance of the Credit Score dataset (CV results).}
 \end{table}
 
-
-While the Decision Tree achieved perfect training accuracy, this performance likely reflects overfitting to the small dataset.
-In contrast, Logistic Regression produced slightly lower but more realistic results, maintaining good accuracy while capturing the main relationship between \texttt{Monthly.credit.card.exp} and the target without memorizing individual samples.
-The SVM shows strong but not perfect generalization — less prone to overfitting than the Decision Tree and slightly more flexible than Logistic Regression.
+While the Decision Tree achieved the highest apparent accuracy, this likely reflects
+overfitting. Logistic Regression achieved similarly strong results but with better
+generalization. The SVM showed lower scores yet provided the most balanced trade-off
+between flexibility and robustness.
 
 % ------------------------------------------------------------------------
 
@@ -264,9 +266,8 @@ silhouette.
 The dataset comprises \textbf{846} \textbf{instances},
 each with \textbf{18 numerical features}, many of which are significantly
 \textbf{correlated}. Preliminary inspection of the feature names
-indicate that these advanced measurements may represent
-\textbf{higher-order volumetric moments} and \textbf{inertia}-like
-characteristics derived from each vehicle stereometric measurements.
+indicate that these features likely represent higher-order shape descriptors
+(e.g., volumetric or moment-based measures) derived from vehicle silhouettes.
 
 Given the nature of the features, some of them may be redundant or
 \textbf{contribute marginal gains} relative to their computational cost.
@@ -616,7 +617,8 @@ statistical upper and lower bounds for model effectiveness.
 
 \section{Dataset 3: Congressional Voting}
 
-\cite{KaggleCongressionalVoting2025}
+This dataset was provided via Kaggle\cite{KaggleCongressionalVoting2025}
+and contains data about votes that took place in the US congress.
 
 \subsection{Overview}
 
@@ -858,16 +860,20 @@ The target variable (\texttt{Class}) spans 50 authors but is quite balanced:
 
 \includegraphics[width=\textwidth]{img/reviews_perAuthor}
 
-Feature importance analysis using LightGBM revealed that very few features have most predictive power:
+Feature importance analysis using LightGBM revealed that the vast majority of features
+do not hold predictive power:
 
+\begin{figure}
+    \centering
 \includegraphics[width=0.8\textwidth]{img/reviews_featureImportanceLGBM}
+\end{figure}
 
 In later steps we reduce the number of features both to reduce noise and help with runtime.
 To understand the nature of the features, feature importances from a linear model
 (Logistic Regression) were compared with those from LightGBM.
 
 The comparison shows a strong correlation ($r \approx 0.75$), suggesting that most predictive information
-is linear - differences in mean feature values across authors. However, a subset of features is rated
+is linear. However, a subset of features is rated
 as more important by LightGBM, indicating additional non-linear dependencies and interactions.
 This means that the dataset contains both linear and non-linear relationships.
 
@@ -914,23 +920,22 @@ Reduced & 0.556 & 0.516 & 53.94 \\
 
 On the full dataset, Logistic Regression achieved an accuracy of 0.51 and a macro-F1 of 0.49.
 After applying our dimensionality reduction pipeline—removing low-variance and low-importance
-features—the model improved to 0.56 accuracy and 0.52 F1, while runtime dropped by almost 90%.
-
-We observed that the model initially struggled due to noise and feature redundancy, as thousands
-of near-constant variables diluted the signal. Once irrelevant attributes were removed, performance
-increased, indicating that most of the predictive power was contained in a much smaller subset of features.
+features—the model improved to 0.56 accuracy and 0.52 F1, which might not be a significant
+improvement, however the runtime dropped by almost 90\%.
 
 While Logistic Regression did not reach the top performance of Random Forests, it handled the dataset’s linear
 component well and provided interpretable insights into feature importance. However, the extremely long runtime
 (almost 400 minutes) highlights that linear solvers scale poorly with tens of thousands of features, especially
 under ElasticNet regularization. This makes Logistic Regression computationally demanding for high-dimensional
-text representations but still a strong and stable baseline.
+text representations but still a strong and stable baseline. For comparison, random guessing with 50 target variables
+has an expected success rate of only 2\%.
 
 \subsection{Model 2: Decision Tree}
 
-Worrying about the tree fitting to noise we first limited the growht of the tree by its paramters 
-(\texttt{max_depth=15, min_samples_split=5}). However we archieved the worst model performance 
-yet, so in a second run, we removed all depth restrictions (\texttt{max_depth=None}).
+To prevent overfitting to noise we initially limited the growth of the tree by its parameters
+(\texttt{max\_depth=15, min\_samples\_split=5}). However, this configuration produced the
+lowest performance among all models, so in a second run, we removed all depth restrictions
+(\texttt{max\_depth=None}) to see if our chosen parameters caused the problems.
 
 Allowing the tree to grow without depth restrictions slightly increased performance, but the 
 overall improvement remained minor. Both configurations performed far below other models, 
@@ -938,22 +943,21 @@ indicating that the tree was unable to extract strong predictive patterns from t
 
 \begin{table}[H]
 \centering
-\caption{Cross-validation results for the Decision Tree on full and reduced feature sets.}
+\caption{Performance of the Decision Tree (CV results).}
 \label{tab:dt_reviews}
 \begin{tabular}{lcc}
 \toprule
-\textbf{Dataset} & \textbf{Mean Accuracy} & \textbf{Macro-F1} \
+\textbf{Dataset} & \textbf{Mean Accuracy} & \textbf{Macro-F1} \\
 \midrule
-Reduced (depth = 15) & 0.141 & 0.105 \
-Full (depth = 15) & 0.091 & 0.062 \
-Reduced (no depth limit) & 0.232 & 0.177 \
-Full (no depth limit) & 0.225 & 0.178 \
+Reduced (depth = 15) & 0.141 & 0.105 \\
+Full (depth = 15) & 0.091 & 0.062 \\
+Reduced (no depth limit) & 0.232 & 0.177 \\
+Full (no depth limit) & 0.225 & 0.178 \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-With over 10,000 discrete features and only 750 samples, most features contribute weakly and 
-redundantly to the prediction. Even after dimensionality reduction, the ratio 
+With 10,000 features and 750 samples, the feature-to-instance ratio severely limits the
+tree’s ability to generalize. . Even after dimensionality reduction, the ratio
 between features and samples remained too large for a single tree to model effectively.
 
 Consequently, while the model provided a useful diagnostic baseline for non-linear 
@@ -979,7 +983,7 @@ Reduced & 0.500 & 0.450 & 0.10 \\
 \end{table}
 
 The SVM struggled on the full dataset, reaching only 0.33 accuracy and 0.30 macro-F1.
-That result isn’t surprising — with over 10,000 features but just 750 samples, the RBF kernel
+This result was expected — with over 10,000 features but just 750 samples, the RBF kernel
 couldn’t find a good boundary between classes.
 
 After dimensionality reduction, performance improved substantially (accuracy 0.50, F1 0.45), and runtime
@@ -991,20 +995,46 @@ We found that the main limiting factors were the extremely high feature-to-sampl
 which made kernel estimation unstable and the integer-only feature representation, which reduced
 the benefit of RBF’s continuous mapping.
 
-In summary, the SVM captured some non-linear structure in the data but was inefficient and less accurate
-for this problem type.
+In summary, although the SVM captured some non-linear relationships, it was
+hindered by the dataset’s high dimensionality and discrete feature space.
 
-\subsection{Ensemble Learning}
 
-Two extensions were implemented:
+\subsection{Other models}
 
-\begin{itemize}
-    \item \textbf{Random Forest:} Introduced as a robust, variance-reducing tree ensemble baseline and evaluated using 10-fold cross-validation.
-    \item \textbf{Stacked Ensemble:} Combined all base models (Logistic Regression, SVM, Decision Tree, and Random Forest)
-    using \texttt{StackingClassifier}. Each base learner retained its pipeline, while a Logistic Regression meta-model
-    was trained on their predicted class probabilities (\texttt{stack\_method="predict\_proba"}).
-    Five-fold stratified cross-validation was used for evaluation.
-\end{itemize}
+\subsubsection{Random Forest}
+
+After the bad performnace of a single decision tree we also wanted
+to test a Random Forest.
+
+Random Forests were trained as an ensemble of 300 decision trees.
+This method is better suited for datasets with high dimensionality
+and complex feature interactions, as it can capture non-linear
+dependencies without requiring extensive parameter tuning.
+
+\begin{table}[H]
+    \centering
+\label{tab:random_forest}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Dataset} & \textbf{Accuracy} & \textbf{Macro-F1} & \textbf{Runtime [min]} \\
+\midrule
+Full & \textbf{0.704} & \textbf{0.678} & \textbf{0.24} \\
+Reduced & 0.652 & 0.605 & 0.19 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The Random Forest significantly outperformed all other single models
+tested on this dataset, achieving an accuracy of 0.70 and a macro-F1
+of 0.68 on the full feature set. Notably, it reached this level of
+performance at a fraction of the runtime required by Logistic
+Regression (less than one minute versus over six hours).
+
+Reducing the number of features slightly decreased performance,
+indicating that it hurt the Random Forest's ability to collect
+information from weakly contributing variables.
+
+\subsection{Summary}
 
 \begin{table}[H]
 \centering
@@ -1014,52 +1044,30 @@ Two extensions were implemented:
 \toprule
 \textbf{Model} & \textbf{Dataset} & \textbf{Accuracy} & \textbf{Macro-F1} & \textbf{Runtime [min]} \\
 \midrule
-\multirow{LightGBM} & Full & 0.543 & 0.505 & 17.37 \\
+\multirow{2}{*}{LightGBM} & Full & 0.543 & 0.505 & 17.37 \\
  & Reduced & 0.560 & 0.519 & 12.34 \\
 \midrule
-\multirow{Logistic Regression} & Full & 0.513 & 0.490 & 397.58 \\
+\multirow{2}{*}{Logistic Regression} & Full & 0.513 & 0.490 & 397.58 \\
  & Reduced & 0.556 & 0.516 & 53.94 \\
 \midrule
-\multirow{Random Forest} & Full & \textbf{0.704} & \textbf{0.678} & \textbf{0.24} \\
- & Reduced & 0.652 & 0.605 & 0.19 \\
-\midrule
-\multirow{SGD Classifier (EN)} & Full & 0.685 & 0.653 & 0.81 \\
- & Reduced & 0.412 & 0.369 & 0.13 \\
-\midrule
-\multirow{SVM} & Full & 0.332 & 0.303 & 0.52 \\
+\multirow{2}{*}{SVM} & Full & 0.332 & 0.303 & 0.52 \\
  & Reduced & 0.500 & 0.450 & 0.10 \\
+\midrule
+\multirow{2}{*}{Random Forest} & Full & \textbf{0.704} & \textbf{0.678} & \textbf{0.24} \\
+ Reduced & 0.652 & 0.605 & 0.19 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 Random Forest achieved the highest accuracy (0.70) and Macro-F1 (0.68) on the full dataset,
-making it the best overall performer. The SGDClassifier with ElasticNet penalty followed closely
-(Accuracy 0.69, F1 0.65) while training in under one minute, offering a good speed–performance trade-off.
-LightGBM performed moderately well (Accuracy 0.54, F1 0.50) but required much longer runtime
-($\sim$17 minutes), suggesting inefficient parameterization or limited benefit from its gradient boosting
-approach on this feature type. SVC (RBF) performed poorly on the full feature set (F1 $\approx$ 0.30),
-likely due to the curse of dimensionality.
+making it the best overall performer. LightGBM, which was initially trained for features selection,
+performed moderately well (Accuracy 0.54, F1 0.50) but required much longer runtime
+($\sim$17 minutes). SVM performed poorly on the full feature set (F1 $\approx$ 0.30).
 
 On the reduced dataset, performance remained stable or improved slightly for most models,
 while runtimes decreased substantially. Logistic Regression and SVM benefited the most
-from reduced dimensionality, whereas Random Forest and SGD maintained strong performance,
+from reduced dimensionality, whereas Random Forest maintained strong performance,
 demonstrating that the feature selection pipeline preserved key predictive information.
-
-Overall, the Random Forest offered the best accuracy–runtime balance,
-and the Stacked Ensemble provided the most stable performance across cross-validation folds.
-Feature reduction proved highly effective, improving efficiency without harming predictive quality.
-Tree-based models showed resilience to redundant features, while regularized linear models
-gained interpretability and speed from dimensionality reduction.
-
-\subsection{Summary}
-
-The Amazon Reviews dataset posed a challenging high-dimensional, mixed-signal classification problem.
-Through careful preprocessing, feature reduction, and model selection across both linear and non-linear
-approaches, robust performance was achieved. Random Forest and ElasticNet Logistic Regression emerged
-as consistently strong performers, and the stacking ensemble successfully leveraged their complementary strengths.
-This experiment confirmed that hybrid ensembles can effectively combine linear calibration and
-non-linear flexibility to achieve superior generalization on complex, text-derived feature spaces.
-
 
 \section{Summary}\label{sec:final_summary}
 
@@ -1069,7 +1077,7 @@ Note: For models that were trained with different parameters the best result is 
 \centering
 \begin{tabular}{llcc}
 \toprule
-\textbf{Dataset} & \textbf{Model} & \textbf{CV Accuracy} & \textbf{Macro F1} \\
+\textbf{Dataset} & \textbf{Model} & \textbf{CV Accuracy} & \textbf{macro-F1} \\
 \midrule
 Credit Score & Logistic Regression & 0.970 $\pm$ 0.024 & 0.964 $\pm$ 0.030 \\
 Credit Score & Decision Tree        & 0.980 $\pm$ 0.024 & 0.976 $\pm$ 0.029 \\
@@ -1087,7 +1095,7 @@ Congressional Voting & SVM    & 0.954 & 0.937 \\
 Congressional Voting & Naïve Bayes            & 0.917 & 0.895 \\
 \midrule
 Reviews & Logistic Regression & 0.556 & 0.516 \\
-Reviews & Decision Tree & & 0.232 & 0.177 \\
+Reviews & Decision Tree & 0.232 & 0.177 \\
 Reviews & SVM & 0.500 & 0.450 \\
 Reviews & Random Forest & 0.704 & 0.678 \\
 \bottomrule
