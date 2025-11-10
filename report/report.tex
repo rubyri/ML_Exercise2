@@ -927,9 +927,37 @@ under ElasticNet regularization. This makes Logistic Regression computationally 
 text representations but still a strong and stable baseline.
 
 \subsection{Model 2: Decision Tree}
-As a non-linear baseline, a Decision Tree model was tested to capture local feature interactions and thresholds.
-Relevant parameters:
-\texttt{criterion="gini"}, \texttt{max\_depth=20}, \texttt{min\_samples\_split=10}, \texttt{min\_samples\_leaf=5}.
+
+Worrying about the tree fitting to noise we first limited the growht of the tree by its paramters 
+(\texttt{max_depth=15, min_samples_split=5}). However we archieved the worst model performance 
+yet, so in a second run, we removed all depth restrictions (\texttt{max_depth=None}).
+
+Allowing the tree to grow without depth restrictions slightly increased performance, but the 
+overall improvement remained minor. Both configurations performed far below other models, 
+indicating that the tree was unable to extract strong predictive patterns from the data.
+
+\begin{table}[H]
+\centering
+\caption{Cross-validation results for the Decision Tree on full and reduced feature sets.}
+\label{tab:dt_reviews}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Dataset} & \textbf{Mean Accuracy} & \textbf{Macro-F1} \
+\midrule
+Reduced (depth = 15) & 0.141 & 0.105 \
+Full (depth = 15) & 0.091 & 0.062 \
+Reduced (no depth limit) & 0.232 & 0.177 \
+Full (no depth limit) & 0.225 & 0.178 \
+\bottomrule
+\end{tabular}
+\end{table}
+
+With over 10,000 discrete features and only 750 samples, most features contribute weakly and 
+redundantly to the prediction. Even after dimensionality reduction, the ratio 
+between features and samples remained too large for a single tree to model effectively.
+
+Consequently, while the model provided a useful diagnostic baseline for non-linear 
+feature interactions, it was not suitable as a standalone classifier for this dataset.
 
 \subsection{Model 3: Support Vector Machine}
 Relevant parameters: \texttt{kernel="rbf"}, \texttt{C=2.0}, \texttt{gamma="scale"}
@@ -1035,6 +1063,8 @@ non-linear flexibility to achieve superior generalization on complex, text-deriv
 
 \section{Summary}\label{sec:final_summary}
 
+Note: For models that were trained with different parameters the best result is shown in the table. 
+
 \begin{table}[H]
 \centering
 \begin{tabular}{llcc}
@@ -1057,7 +1087,7 @@ Congressional Voting & SVM    & 0.954 & 0.937 \\
 Congressional Voting & Naïve Bayes            & 0.917 & 0.895 \\
 \midrule
 Reviews & Logistic Regression & 0.556 & 0.516 \\
-Reviews & Decision Tree & $\sim$0.60 & $\sim$0.55 \\
+Reviews & Decision Tree & & 0.232 & 0.177 \\
 Reviews & SVM & 0.500 & 0.450 \\
 Reviews & Random Forest & 0.704 & 0.678 \\
 \bottomrule
