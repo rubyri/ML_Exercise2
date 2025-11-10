@@ -1,32 +1,41 @@
 \contentsline {section}{\numberline {1}Introduction}{2}{section.1}%
-\contentsline {section}{\numberline {2}Data Set 1: Credit Score}{2}{section.2}%
+\contentsline {section}{\numberline {2}Dataset 1: Credit Score}{2}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Overview}{2}{subsection.2.1}%
 \contentsline {subsubsection}{\numberline {2.1.1}Feature Distribution (Numeric)}{3}{subsubsection.2.1.1}%
 \contentsline {subsubsection}{\numberline {2.1.2}Feature Distribution (Binary)}{4}{subsubsection.2.1.2}%
 \contentsline {subsection}{\numberline {2.2}Data cleaning and pre-processing}{4}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Logistic Regression (m1a)}{6}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Decision Tree (m1b)}{7}{subsection.2.4}%
-\contentsline {subsection}{\numberline {2.5}Support Vector Machine (m1c)}{8}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.3}Model 1: Logistic Regression}{6}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}Cross Validation}{6}{subsubsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.4}Model 2: Decision Tree}{7}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Model 3: Support Vector Machine}{7}{subsection.2.5}%
 \contentsline {subsection}{\numberline {2.6}Summary}{8}{subsection.2.6}%
-\contentsline {section}{\numberline {3}Data Set 2: Vehicle}{9}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Overview}{9}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Pre-processing}{9}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Algorithm 1}{9}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}Algorithm 2}{9}{subsection.3.4}%
-\contentsline {subsection}{\numberline {3.5}Algorithm 3}{9}{subsection.3.5}%
-\contentsline {subsection}{\numberline {3.6}Summary}{9}{subsection.3.6}%
-\contentsline {section}{\numberline {4}Data Set 3}{9}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Overview}{9}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Pre-processing}{9}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Algorithm 1}{9}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Algorithm 2}{9}{subsection.4.4}%
-\contentsline {subsection}{\numberline {4.5}Algorithm 3}{9}{subsection.4.5}%
-\contentsline {subsection}{\numberline {4.6}Summary}{9}{subsection.4.6}%
-\contentsline {section}{\numberline {5}Data Set 4}{9}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Overview}{9}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Pre-processing}{9}{subsection.5.2}%
-\contentsline {subsection}{\numberline {5.3}Algorithm 1}{9}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}Algorithm 2}{9}{subsection.5.4}%
-\contentsline {subsection}{\numberline {5.5}Algorithm 3}{9}{subsection.5.5}%
-\contentsline {subsection}{\numberline {5.6}Summary}{9}{subsection.5.6}%
-\contentsline {section}{\numberline {6}Summary}{9}{section.6}%
+\contentsline {section}{\numberline {3}Dataset 2: Vehicle}{8}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Overview}{8}{subsection.3.1}%
+\contentsline {paragraph}{Feature Redundancy Hypothesis:}{8}{section*.2}%
+\contentsline {subsection}{\numberline {3.2}Pre-processing}{8}{subsection.3.2}%
+\contentsline {paragraph}{Feature Selection with Recursive Feature Elimination (RFE):}{9}{section*.3}%
+\contentsline {subsection}{\numberline {3.3}Model 1: Logistic Regression}{10}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Model 2: Decision Tree}{10}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Decision Tree Classifier}{10}{subsection.3.5}%
+\contentsline {subsection}{\numberline {3.6}Model 3: SVM}{11}{subsection.3.6}%
+\contentsline {subsection}{\numberline {3.7}Other Models}{12}{subsection.3.7}%
+\contentsline {subsubsection}{\numberline {3.7.1}Random Forest}{12}{subsubsection.3.7.1}%
+\contentsline {subsubsection}{\numberline {3.7.2}KNN}{12}{subsubsection.3.7.2}%
+\contentsline {subsection}{\numberline {3.8}Summary}{13}{subsection.3.8}%
+\contentsline {section}{\numberline {4}Dataset 3: Congressional Voting}{13}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Overview}{13}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Pre-processing}{14}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Model 1: Logistic Regression}{14}{subsection.4.3}%
+\contentsline {paragraph}{Cross Validation}{14}{section*.4}%
+\contentsline {subsection}{\numberline {4.4}Model 2: Classification Tree}{15}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5}Other Models}{16}{subsection.4.5}%
+\contentsline {subsubsection}{\numberline {4.5.1}Naïve Bayes}{16}{subsubsection.4.5.1}%
+\contentsline {subsection}{\numberline {4.6}Summary}{16}{subsection.4.6}%
+\contentsline {section}{\numberline {5}Dataset 4: Amazon reviews}{17}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Overview}{17}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Pre-processing}{18}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Model 1: Logistic Regression}{18}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}Model 2: Decision Tree}{18}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Model 3: SVM}{18}{subsection.5.5}%
+\contentsline {subsection}{\numberline {5.6}Summary}{18}{subsection.5.6}%
+\contentsline {section}{\numberline {6}Summary}{19}{section.6}%

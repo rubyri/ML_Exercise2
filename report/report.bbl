@@ -19,6 +19,64 @@
 
 \refsection{0}
   \datalist[entry]{nty/global//global/global/global}
+    \entry{KaggleCongressionalVoting2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=8fec9765921cfa63cb331e42a924c27c}{%
+           family={Kaggle},
+           familyi={K\bibinitperiod}}}%
+      }
+      \strng{namehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{fullhash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{fullhashraw}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{bibnamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorbibnamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authornamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorfullhash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorfullhashraw}{8fec9765921cfa63cb331e42a924c27c}
+      \field{extraname}{1}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Accessed November 9, 2025}
+      \field{title}{184-702 TU ML 2025 W: Congressional Voting}
+      \field{year}{2025}
+      \verb{urlraw}
+      \verb https://www.kaggle.com/competitions/184-702-tu-ml-2025-w-congressional-voting
+      \endverb
+      \verb{url}
+      \verb https://www.kaggle.com/competitions/184-702-tu-ml-2025-w-congressional-voting
+      \endverb
+    \endentry
+    \entry{KaggleReviews2025}{online}{}{}
+      \name{author}{1}{}{%
+        {{hash=8fec9765921cfa63cb331e42a924c27c}{%
+           family={Kaggle},
+           familyi={K\bibinitperiod}}}%
+      }
+      \strng{namehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{fullhash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{fullhashraw}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{bibnamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorbibnamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authornamehash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorfullhash}{8fec9765921cfa63cb331e42a924c27c}
+      \strng{authorfullhashraw}{8fec9765921cfa63cb331e42a924c27c}
+      \field{extraname}{2}
+      \field{sortinit}{K}
+      \field{sortinithash}{c02bf6bff1c488450c352b40f5d853ab}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{note}{Accessed November 9, 2025}
+      \field{title}{184-702 TU ML 2025 W: Reviews}
+      \field{year}{2025}
+      \verb{urlraw}
+      \verb https://www.kaggle.com/competitions/184-702-tu-ml-2025-w-reviews
+      \endverb
+      \verb{url}
+      \verb https://www.kaggle.com/competitions/184-702-tu-ml-2025-w-reviews
+      \endverb
+    \endentry
     \entry{openml_creditscore}{misc}{}{}
       \name{author}{1}{}{%
         {{hash=d749892c1ea0227ba5b7443423277287}{%

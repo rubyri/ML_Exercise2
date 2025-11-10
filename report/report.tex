@@ -1,4 +1,7 @@
-% !TEX root = report.tex 
+%! suppress = MissingLabel
+%! suppress = TooLargeSection
+%! suppress = LineBreak
+% !TEX root = report.tex
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{authblk}
@@ -9,37 +12,53 @@
 \usepackage[backend=biber,style=numeric,url=true,doi=false,isbn=false]{biblatex}
 \usepackage{amsmath}
 \usepackage{float}
+\usepackage{amstext}
+\usepackage[a4paper,margin=3.5cm]{geometry}
 
-\addbibresource{references.bib} 
+\addbibresource{references.bib}
 
-\author{Tanja Matura (01307001), Fausto, Stephan}
+\author{Matura Tanja (01307001), Morando Fausto, Drepenteris Stefanos}
 \date{\today}
-\title{My First LaTeX Document}
+\title{Machine Learning report}
 
 \begin{document}
 
 \maketitle
 
 \tableofcontents
+\setcounter{tocdepth}{2}
 
 \section{Introduction}
-Hello, world! This is a simple \LaTeX{} document compiled in VS Code.
+To ensure consistent and comparable evaluation across all four datasets, three complementary classification algorithms were selected:
 
-\section{Data Set 1: Credit Score}
+\begin{itemize}
+  \item \textbf{Logistic Regression (ElasticNet):} A linear model that estimates class probabilities using a logistic function. ElasticNet regularization combines L1 (Lasso) and L2 (Ridge) penalties to balance feature selection and stability. It serves as a strong and interpretable baseline.
+  \item \textbf{Decision Tree:} A non-parametric model that recursively splits the feature space into homogeneous regions. It captures nonlinear interactions, is interpretable, and robust to mixed data types, though it may overfit small datasets without pruning.
+  \item \textbf{Support Vector Machine (SVM):} A kernel-based classifier that finds the optimal separating hyperplane between classes by maximizing the margin. SVMs are particularly effective for small- to medium-sized datasets with complex, potentially non-linear decision boundaries.
+\end{itemize}
 
-The first data set we looked at is the \texttt{analcatdata\_creditscore} dataset from OpenML\cite{openml_creditscore}. 
-The dataset comes from the book `Analyzing Categorical Data', by Jeffrey S. Simonoff, Springer-Verlag, New York, 2003 \cite{Simonoff2003} and provides data about the credit score of 100 people.
-A more detailed look at the columns is given in the next section. 
+This combination allows for evaluation of three distinct learning paradigms: linear, tree-based, and margin-based approaches.
 
-Our goal will be to predict whether someone's credit application will be approved based on information about them. For this we will 
+An Overview of the results can be found in Section ``summary''.
+
+% ------------------------------------------------------------------------
+
+\section{Dataset 1: Credit Score}
+
+The first data set we looked at is the \texttt{analcatdata\_creditscore} dataset from OpenML\cite{openml_creditscore}.
+The dataset comes from the book `Analyzing Categorical Data', by Jeffrey S. Simonoff, Springer-Verlag, New York, 2003\cite{Simonoff2003} and provides data about the credit score of 100 people.
+A more detailed look at the columns is given in the next section.
+
+Our goal is to predict whether someone's credit application will be approved based on information about them. For this we will
 use logistic regression, a decision tree and a support vector machine. A comparison of results can be found in 2.6 Summary.
 
 \subsection{Overview}
 
 The dataset is small with only 7 columns and 100 entries. All features are numeric, although \texttt{Derogatory.reports}
-represents an ordinal variable. The target is Application.accepted, a binary variable that indicates whether someone's credit 
-application was approved or denied. 
-This table gives an overview over the features and the target: 
+represents an ordinal variable. The target is \textbf{Application.accepted}, a binary variable that indicates whether someone's credit
+application was approved or denied.
+
+This table gives an overview over the features and the target:
 
 \begin{table}[h]
 \centering
@@ -47,39 +66,42 @@ This table gives an overview over the features and the target:
 \toprule
 \textbf{Feature} & \textbf{Types} & \textbf{Observation}\\
 \midrule
-\small Age & \small Numeric (Integer) & \small Range 20-55, mean~32\\
+\small \texttt{Age} & \small Numeric (Integer) & \small Range 20-55, mean~32\\
 \small \texttt{Income.per.dependent} & \small Numeric (Integer) & \small \\
 \small \texttt{Monthly.credit.card.exp} & \small Numeric (Integer) & \small Range 0-1898, mean~189\\
-\small Own.home & \small Categorial (Boolean) & \small 64 Yes, 36 No\\
+\small \texttt{Own.home} & \small Categorial (Boolean) & \small 64 Yes, 36 No\\
 \small \texttt{Self.employed} & \small Categorial (Boolean) & \small 5 Yes, 95 No\\
-\small Derogatory.reports & \small Numeric (Integer) & \small Range 0-7\\
+\small \texttt{Derogatory.reports} & \small Numeric (Integer) & \small Range 0-7\\
 \small \textbf{Application.accepted} & \small Categorial (Boolean) & \small 73 Yes, 27 No\\
 \bottomrule
 \end{tabular}
 \end{table}
 
 It is notable that \textbf{the target variable is skewed}, with 73 being accepted and 27 rejected.
-This is even more true for self.employed (5 yes to 95 no). 
-\texttt{Monthly.credit.card.exp} also seems to contain extreme values, with the range being 0-1898 with 
-a mean of only 189. We will take a look at this outlier later.
+This is even more true for \textbf{self.employed} (5 yes to 95 no).
+\texttt{Monthly.credit.card.exp} also seems to contain extreme values, with the range being 0-1898 with
+a mean of only 189. We will take a closer look at this variable later.
 
-A look at the first few rows of the dataset: 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{img/credit_score_head}
+    \caption{A look at the first few rows of the dataset}
+\end{figure}
 
-\includegraphics[width=0.9\textwidth]{img/credit_score_head.png}
 
-\texttt{Monthly.credit.card.exp} already shows high variance in this snippet and is a candidate for transformation later. 
+\texttt{Monthly.credit.card.exp} already shows high variance in this snippet and is a candidate for transformation later.
 
-The categorical columns - that are binary and therefore encoded as "0" and "1" - and \texttt{Derogatory.reports} are still byte enconded and had to be 
+The categorical columns - that are binary and therefore encoded as \(\texttt{0}\) and \(\texttt{1}\) - and \texttt{Derogatory.reports} are still byte enconded and had to be
 decoded first before they could be worked with.
 
 \subsubsection{Feature Distribution (Numeric)}
 
-Target based distribution of numeric features: 
+Target based distribution of numeric features:
 
-\includegraphics[width=0.9\textwidth]{img/credit_score_featureDistributionTarget.png}
+\includegraphics[width=0.9\textwidth]{img/credit_score_featureDistributionTarget}
 
-The bar plots show some extreme values for \texttt{Monthly.credit.card.exp} and \texttt{Derogatory.reports}. However, neither 
-seem to be unrealistic and therefore not errors in the data set but real extreme values. 
+The bar plots show some extreme values for \texttt{Monthly.credit.card.exp} and \texttt{Derogatory.reports}. However, neither
+seem to be unrealistic and therefore not errors in the data set but real extreme values.
 
 Something else that stands out is that both of these features seem to be highly correlated with the target variable - the application of people with high monthly expenses
 were accepted, while the applications of people with more than two derogatory reports were rejected. To reduce the influence on the prediction we will transform these features before fitting a model (see Pre-Processing).
@@ -87,46 +109,46 @@ were accepted, while the applications of people with more than two derogatory re
 \texttt{Age} and \texttt{Income.per.dependent} also show right skewing and might be transformed later.
 
 \subsubsection{Feature Distribution (Binary)}
-Target based distribution of binary features: 
+Target based distribution of binary features:
 
-\includegraphics[width=0.9\textwidth]{img/credit_score_binaryDistributionTarget.png}
+\includegraphics[width=0.9\textwidth]{img/credit_score_binaryDistributionTarget}
 
-The plots for the binary features show that the \texttt{Self.employed} feature is very unevenely distributed - there ist almost 
-no data for people who are self-employed. Their application rate also goes against the trend, with more applications rejected 
-than accepted. 
+The plots for the binary features show that the \texttt{Self.employed} feature is very unevenely distributed - there ist almost
+no data for people who are self-employed. Their application rate also goes against the trend, with more applications rejected
+than accepted.
 
 \subsection{Data cleaning and pre-processing}
 
-After gaining a better understanding of the data we are working with, we prepared the data to be suitable for model fitting. 
+After gaining a better understanding of the data we are working with, we prepared the data to be suitable for model fitting.
 
 \begin{description}
   \item[Byte-Decoding:] As seen in the first five rows of the dataset, some columns were still byte-encoded after importing the .arff file and had to be decoded first.
   \item[Missing Values:] The Credit Score Dataset is complete and therefore didn't need any handling of missing values.
   \item[Normalization of Binary Features:] To make sure no entry is missed during conversion (in case some binary features aren't encoded as 0 or 1) we searched the columns
-  for subsets of "Yes", "No", "True" and "False" and converted them to 0 and 1, should any be found. 
-  \item[Conversion of Numeric Values:] All numeric values in the dataset were converted from String to ensure later calculations work. For this the pandas function 
+  for subsets of \texttt{Yes}, \texttt{No}, \texttt{True} and \texttt{False} and converted them to 0 and 1, should any be found.
+  \item[Conversion of Numeric Values:] All numeric values in the dataset were converted from String to ensure later calculations work. For this the pandas function
   \texttt{pd.to\_numeric} was used, which detects and converts numeric Strings automatically.
-  \item[Outlier Handling:] Some rows contain extreme values. At first we considered to keep them, however after beginning to work with the dataset an issue arose: 
-  Even after log transforming \texttt{Monthly.credit.card.exp} correlated so strongly with the target that it essentially encoded the same information - leading to unrealistic 0\% prediction error 
+  \item[Outlier Handling:] Some rows contain extreme values. At first we considered to keep them, however after beginning to work with the dataset an issue arose:
+  Even after log transforming \texttt{Monthly.credit.card.exp} correlated so strongly with the target that it essentially encoded the same information - leading to unrealistic 0\% prediction error
   in the first attempts using Logistic Regression.
 
-  Visual diagnostics confirmed that this feature is dominating the others. 
+  Visual diagnostics confirmed that this feature is dominating the others.
 
   \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{img/credit_score_featureImportance.png}
+    \includegraphics[width=0.9\textwidth]{img/credit_score_featureImportance}
   \end{figure}
 
   To reduce the influence of \texttt{Monthly.credit.card.exp} we decided to cap the column. For this we used the IQR: The upper treshold turned out to be 632.01 and 6
-  rows needed to be capped at this value. After capping the extreme values in \texttt{Monthly.credit.card.exp}, the performance of the Logistic Regression model decreased 
-  from 100\% accuracy to a more credible level of 85\%.
+  rows needed to be capped at this value. After capping the extreme values in \texttt{Monthly.credit.card.exp}, the performance of the Logistic Regression model decreased
+  from 100\% accuracy to a more credible level of 90-95\%.
 
   \item[Transformation of Numeric Values:]
   Instead of relying on visuals only we used the function \texttt{skew()} to output the skewness of each numeric feature.
   Features with $|\text{skew}| > 1$ were considered strongly skewed. This applied to \texttt{Monthly.credit.card.exp}
-  and to \texttt{Income.per.dependent}. 
-  
-  After log transformation the features changed as followed: 
+  and to \texttt{Income.per.dependent}.
+
+  After log transformation the features changed as followed:
 
   \begin{table}[H]
   \centering
@@ -142,48 +164,42 @@ After gaining a better understanding of the data we are working with, we prepare
 
   \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{img/credit_score_expensesLog.png}
+    \includegraphics[width=0.9\textwidth]{img/credit_score_expensesLog}
   \end{figure}
 
   \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{img/credit_score_incomeLog.png}
+    \includegraphics[width=0.9\textwidth]{img/credit_score_incomeLog}
   \end{figure}
 
   \item[Scaling of Numeric Values:] Numeric features were scaled using RobustScaler to mitigate the influence of remaining outliers.
   \item[Class Balance of Binary Features:] Our binary columns (including the target) show class imbalance.
-  Features were kept as they are, the imbalance of the target will be adressed by using \texttt{class\_weight='balanced'} during model fitting. 
+  Features were kept as they are, the imbalance of the target will be adressed by using \texttt{class\_weight='balanced'} during model fitting.
   \item[Training- and Test-Split:] 80:20
 \end{description}
 
 
-\subsection{Logistic Regression (m1a)}
+\subsection{Model 1: Logistic Regression}
 As baseline model, we first trained a Logistic Regression classifier to predict \texttt{Application.accepted}.
-Logistic Regression is well-suited for this dataset because the target variable, Application.accepted, is binary (approved vs. rejected), 
+Logistic Regression is well-suited for this dataset because the target variable, \texttt{Application.accepted}, is binary (approved vs. rejected),
 which fits the model`s purpose of predicting probabilities for categorical outcomes.
 
 Since the target variable was moderately imbalanced (approximately 1:3 ratio), two balancing strategies were compared:
 First, assigning class weights inversely proportional to class frequency (\texttt{class\_weight='balanced'}), and
 second, random oversampling of the minority class to equalize class counts.
 
-As discussed earlier the model achieved 100\% accuracy on the training set before Monthly.credit.card.exp was capped.
+As discussed earlier the model achieved 100\% accuracy on the training set before \texttt{Monthly.credit.card.exp} was capped.
 After capping  and re-fitting the model, performance metrics became more realistic.
 
 Both balancing methods produced identical results, with the model achieving an overall accuracy of 85\%.
 The recall for rejected applications (Class 0) remained perfect, indicating no false negatives,
 while the recall for accepted applications (Class 1) slightly decreased to 0.8, suggesting more realistic model behavior.
-
-These results confirm that outlier capping effectively reduced the excessive influence of \texttt{Monthly.credit.card.exp}
-without removing its predictive contribution.
 The model now generalizes better and provides a more balanced interpretation of multiple predictors rather than relying on a single dominating feature.
 
-Cross Validation
+\subsubsection{Cross Validation}
 
-Since we established that the target variable is imbalanced we chose Stratified K-Fold cross-validation. Working with a small dataset also meant that 
+Since we established that the target variable is imbalanced we chose Stratified K-Fold cross-validation. Working with a small dataset also meant that
 we should keep k small, so the validation sets won't become too small.
-
-Mean Accuracy: 0.970 ± 0.024 \\
-Mean F1 Score: 0.964 ± 0.030
 
 \begin{table}[H]
 \centering
@@ -201,24 +217,27 @@ Recall (Class 1) & 0.80 \\
 \end{tabular}
 \end{table}
 
+Mean Accuracy: 0.970 ± 0.024 \\
+Mean F1 Score: 0.964 ± 0.030
 
-\subsection{Decision Tree (m1b)}
 
-The second model we trained was a decision tree. In contrast to Logistic Regression, which assumes a linear relationship between predictors and the log-odds of the target, a Decision Tree partitions the feature space recursively into regions that are more homogeneous with respect to the target variable.
+\subsection{Model 2: Decision Tree}
+
+The second model we trained was a decision tree. In contrast to Logistic Regression, which assumes a linear relationship between predictors and the target, a Decision Tree partitions the feature space recursively into regions that are more homogeneous with respect to the target variable.
 However, since the dataset is relatively small (only 100 samples), trees can easily overfit if left unpruned. Therefore, we limited the depth and minimum number of samples per leaf to help ensure better generalization.
 
-Even with this the tree achieved a perfect prediction score on it's first run - but later cross validation showed that the model does not always predict with perfect accuracy, suggesting that the training and test data split happend to make the dataset perfectly separable. This is again due to the 
-variable \texttt{Monthly.credit.card.exp}. All applications that were rejected did not have any expenses, making it a very strong predictor for a tree (if expenses 0 => reject). However, some people without expenses still received a positive application result, which means the feature 
-cannot be deterministic factor and the model should not achieve 100\% accuracy. 
+Even with this the tree achieved a perfect prediction score on it's first run - but later cross validation showed that the model does not always predict with perfect accuracy, suggesting that the training and test data split happend to make the dataset perfectly separable. This is again due to the
+variable \texttt{Monthly.credit.card.exp}. All applications that were rejected did not have any expenses, making it a very strong predictor for a tree (if expenses 0 $\Rightarrow$ reject). However, some people without expenses still received a positive application result, which means the feature
+cannot be deterministic factor and the model should not achieve 100\% accuracy.
 
-Cross Validation 
+Cross Validation
 
 Mean Accuracy: 0.98 ± 0.024
 Mean F1 Score: 0.976 ± 0.029
 
-\subsection{Support Vector Machine (m1c)}
+\subsection{Model 3: Support Vector Machine}
 
-The third model that was trained for the Credit Score Dataset was a support vecotr machine. A Support Vector Machine (SVM) is a supervised learning algorithm that tries to find the optimal separating boundary (hyperplane) between classes.
+The third model that was trained for the Credit Score Dataset was a support vector machine. A Support Vector Machine (SVM) is a supervised learning algorithm that tries to find the optimal separating boundary (hyperplane) between classes.
 Instead of just any line that separates accepted and rejected applications, it chooses the one that maximizes the margin — the distance between the boundary and the nearest data points from each class (called support vectors).
 This makes it robust to noise and reduces overfitting, especially in small datasets. Its margin-based approach makes it more generalizable than a Decision Tree and more flexible than Logistic Regression when the separation between classes is not perfectly linear.
 
@@ -233,36 +252,711 @@ Mean Accuracy: 0.88 ± 0.05
 Mean F1: 0.86 ± 0.06
 
 \subsection{Summary}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Model} & \textbf{Accuracy (CV)} & \textbf{Macro F1 (CV)} \\
+\midrule
+Logistic Regression & 0.970 $\pm$ 0.024 & 0.964 $\pm$ 0.030 \\
+Decision Tree        & 0.980 $\pm$ 0.024 & 0.976 $\pm$ 0.029 \\
+SVM                  & 0.880 $\pm$ 0.050 & 0.860 $\pm$ 0.060 \\
+\bottomrule
+\end{tabular}
+\caption{Cross-validation results for the Credit Score dataset.}
+\end{table}
+
+
 While the Decision Tree achieved perfect training accuracy, this performance likely reflects overfitting to the small dataset.
 In contrast, Logistic Regression produced slightly lower but more realistic results, maintaining good accuracy while capturing the main relationship between Monthly.credit.card.exp and the target without memorizing individual samples.
 The SVM shows strong but not perfect generalization — less prone to overfitting than the Decision Tree and slightly more flexible than Logistic Regression.
 
-\section{Data Set 2: Vehicle}
+% ------------------------------------------------------------------------
+
+\section{Dataset 2: Vehicle}
 \subsection{Overview}
+
+The dataset comprises \textbf{846} \textbf{instances} of stereometric vehicle data,
+each with \textbf{18 numerical features}, many of which are significantly
+\textbf{correlated}. Preliminary inspection of the feature names
+indicate that these advanced measurements may represent
+\textbf{higher-order volumetric moments} and \textbf{inertia}-like
+characteristics derived from each vehicle stereometric measurements.
+
+\paragraph{Feature Redundancy Hypothesis:}
+
+Given the nature of the features, some of them may be redundant or
+\textbf{contribute marginal gains} relative to their computational cost.
+A correlation matrix analysis revealed multiple attribute pairs with
+correlation magnitudes greater than 0.7, though never 1. This suggests
+that are strongly related, but not linearly dependent. It is further
+assumed that the correlated features encode some kind of
+\textbf{direction-depended tensor information}, that results in
+substantial, but not unary correlation magnitudes.
+
+To address the classification task and due to the high-dimensional,
+multiple instance dataset, the models considered were:
+
+\begin{itemize}
+\item Support Vector Machine (SVM)
+\item Random Forests (included for documentation purposes only)
+\item K-Nearest Neighbours (KNN)
+\item Logistic Regression
+\end{itemize}
+
+These models offer insights to effectiveness, interpretability and
+computational cost tradeoffs.
+
+
 \subsection{Pre-processing}
-\subsection{Algorithm 1}
-\subsection{Algorithm 2}
-\subsection{Algorithm 3}
+
+In the context of finding the best fitted model the metric for
+performance used was the 10 fold cross-validation (CV) score.
+
+\begin{description}
+  \item[CV Variability:] Preliminary tests showed high variability of CV scores (verified also by
+other performance metrics) depending on the selected training/test
+dataset split. This sensitivity was addressed by testing multiple of the
+most common (2/3-1/3, 80/20, 90/10 as well as intermediate ratios),
+using the \textbf{train\_test\_split} routine, reproducible with a fixed
+random seed 42. The \textbf{stratify} feature was also used, to maintain
+the statistical characteristics of the original dataset when creating
+subsets. This ensures that the performance metrics produced for the best
+models are comparable with each other.
+
+After selecting a candidate model for training, in order to identify the
+optimal setting, multiple values for all relevant hyperparameters were
+inserted into a \textbf{parameter\_grid}, as reference for a pipeline of
+training. Then using the routine \textbf{GridSearchCV} the best fitted
+model for each dataset split, as well as the hyperparameters used where
+identified. The performance of each candidate best model was verified by testing on
+the same, held-out set of data using standard  performance metrics: Accuracy, Precision, Recall and F1 score.
+  \item[Train/Test split:] For the majority of models, when trained on more that ca. 700+ instances
+showed diminished effectiveness, suggesting overfitting or bias
+introduced by the imbalanced tail-end of the otherwise balanced dataset.
+This observation is further related to the following remark:
+  \item[Fit/Validation Tradeoff:] CV score becomes less accurate as the validation size decreases. For
+splits with \textgreater90\% of the data used for training, CV often
+overestimates model fit. This is a result of an unavoidable tradeoff,
+between training depth and validation integrity.
+  \item[Performance Visualization:] As discussed, although the localized CV is in certain cases an
+unreliable indicator of actual performance, a plot of the CV vs the
+dataset percentage used for training produces an insightful
+visualization of dataset regions with particular characteristics, such
+as localized noise that may or may not help the model by increasing its
+robustness.
+    \item[Principal Component Analysis (PCA):] In an effort to reduce the computational effort as well as potential
+outlier values that were difficult to otherwise identify due to the
+attribute vagueness, the PCA technique was used to combine highly
+correlated features and reduce the dataset dimensionality, maintaining
+in a good degree the dataset variance. Multiple variance thresholds
+resulting to different number of components were selected for each run.
+The performance scores where in most cases improved by approximately
+5\%. The unavoidable cost is the complete loss of interpretability, as
+the components used as input for the model have no actual meaning or
+relation to the original 18 attributes.
+\end{description}
+
+\paragraph{Feature Selection with Recursive Feature Elimination (RFE):}
+
+This method was inspired by the Feature Redundancy Hypothesis
+discussed previously, with a goal of ranking the features by importance
+and incrementally including them to assess their individual contribution
+to model performance. The iterative inclusion strategy allowed for
+controlled evaluation of each feature's utility, balancing predictive
+gain and additional computational load.
+
+This approach did not lead to noticeable improvements, by discarding the
+least contributing feature for the particular model `Kurtosis about
+major' and reducing the dataset by one dimension yielded at best
+\texttt{{[}Accuracy=0.78, Precission=0.78, Recall=0.78{]}} for the
+noticeably different setting \texttt{{[}entropy, max depth=10, max
+features = log2, min samples leaf=1, mi samples split=2, n
+estimators=100{]}}
+
+\subsection{Model 1: Logistic Regression}
+Logistic Regression was selected as a baseline model for the
+classification task due to its efficiency and robustness under highly
+correlated features providing also linear decision boundaries.
+
+For the hyperparameters, three types of \textbf{penalties} (\(L_{1}\),
+\(L_{2}\), elasticnet hybrid) and a total of five magnitude scales for
+the regularization parameter \texttt{C} (1e-2, \ldots{} , 1e+2) were tested. Further
+tests showed that there was no usable model with regularization
+\textgreater{} 1e+2. In order to not introduce additional computational
+load, a \textbf{solver} (saga) compatible with both \(L_{1}\), \(L_{2}\)
+norms was chosen and finally only for the elasticnet penalty, a
+\textbf{ratio} (0.15, 0.5, 0.85) of the two norms had to be included in
+the \textbf{parameter\_grid}. To ensure convergence, a very high
+max\_iter=1e4 was also set.
+
+A surprising observation was that the hybrid model did not dominate in
+the best candidate models per CV, with all penalties appearing equally
+often, but \(L_{2}\) showed more consistent results with different
+regularization parameters. The best predicted CV model was
+\texttt{{[}C=100, p=L2{]}} trained on 95\%, once again displaying a high
+training size bias and the actual recorded best was \texttt{{[}C=10,
+ratio=0.5{]}} trained on 70\% of the dataset and yielding in the
+following performance metrics \texttt{{[}Accuracy=0.85, Precision=0.85,
+Recall=0.85{]}}
+
+Although the actual size of the test data varies between splits, using
+stratify we ensure that each test set has similar statistical
+characteristics and belongs to a fixed test superset. Assuming
+it is sufficiently populated (as in this case with no deficiency
+warnings) we can assume the scores are comparable, keeping in mind
+that smaller test sets may introduce slightly larger standard deviation.
+
+\subsection{Model 2: Decision Tree}
+
+\subsection{Model 3: Decision Tree Classifier}
+
+To complement the previous models, a Decision Tree Classifier was trained and evaluated on the vehicle dataset.
+The model was tuned using a grid search across several key hyperparameters: \texttt{criterion} (\texttt{gini}, \texttt{entropy}),
+\texttt{max\_depth} (None, 10, 20, 30, 40), \texttt{min\_samples\_split} (2, 5, 10),
+\texttt{min\_samples\_leaf} (1, 2, 4), and \texttt{splitter} (\texttt{best}, \texttt{random}).
+Cross-validation was conducted with 10 folds over various training proportions (from 65\% to 95\%), mirroring the procedure applied to the other classifiers.
+
+The best-performing configuration was found at a training proportion of 95\%, with the following parameters:
+\texttt{criterion=entropy}, \texttt{max\_depth=10}, \texttt{min\_samples\_split=5},
+\texttt{min\_samples\_leaf=2}, and \texttt{splitter=best}.
+Under these settings, the Decision Tree achieved an overall accuracy of \textbf{70\%} on the validation set,
+with a macro-averaged F1-score of \textbf{0.71}.
+
+A detailed breakdown of the per-class performance is shown in Table~\ref{tab:dt_report}.
+The model performed particularly well on the \textit{bus} class (F1 = 0.91), while its performance was more modest
+on the \textit{opel} (F1 = 0.48) and \textit{saab} (F1 = 0.56) classes, indicating some confusion among visually similar vehicle types.
+
+\begin{table}[H]
+\centering
+\caption{Decision Tree classification report for the vehicle dataset.}
+\label{tab:dt_report}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} & \textbf{Support} \\
+\midrule
+Bus  & 0.91 & 0.91 & 0.91 & 11 \\
+Opel & 0.50 & 0.45 & 0.48 & 11 \\
+Saab & 0.50 & 0.64 & 0.56 & 11 \\
+Van  & 1.00 & 0.80 & 0.89 & 10 \\
+\midrule
+\textbf{Accuracy} & \multicolumn{4}{c}{0.70} \\
+\textbf{Macro avg} & 0.73 & 0.70 & 0.71 & 43 \\
+\textbf{Weighted avg} & 0.72 & 0.70 & 0.70 & 43 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Overall, the Decision Tree demonstrates a balanced performance with strong interpretability.
+While it does not surpass the ensemble models in predictive power, its transparent decision boundaries make it
+a valuable baseline for understanding the structure of the data and feature relevance.
+
+
+\subsection{Model 3: SVM}
+Support Vector Machines are well-equipped to manage high-dimensional
+datasets due to their ability to construct optimal decision boundaries
+in complex feature spaces. Despite their known sensitivity to highly
+correlated features, a preliminary evaluation was conducted without
+accounting for the latter, serving as a baseline for effectiveness.
+Surprisingly, the SVM models yielded strong results, indicating that
+either the kernel function compensated for the redundancy or that the
+correlated features retained complementary discriminative value.
+
+For the hyperparameters, three types of \textbf{kernels} (linear, RBF,
+polynomial of degree 2,3,4) and a total of five magnitude scales for the
+regularization parameter \textbf{C} (1e-1, \ldots{} , 1e+3) were used. Further
+tests showed that there was no usable model with regularization
+\textgreater{} 1e+3 and also the parameter \textbf{gamma}, the influence
+of a single training example, yielded always best results when set to
+`scale'. The linear kernel consistently delivered stable and
+satisfactory performance across multiple training splits. However,
+certain configurations of the RBF kernel achieved superior results,
+likely due to their ability to capture nonlinear relationships within
+the feature space. In contrast, the polynomial kernel consistently
+underperformed.
+
+\includegraphics[width=\textwidth]{img/vehicle_SVMkernels}
+
+It is worth mentioning that the best predicted model per CV score was
+\texttt{{[}rbf, C=100, gamma=scale{]}} trained on 95\% of the dataset.
+This is actually an instance where the CV accuracy problem is apparent.
+By searching all the test runs, the best model had remarkably the exact
+same hyperparameter setting, but it was trained on 75\% of the dataset
+instead. The produced performance metrics \texttt{{[}Accuracy=0.87,
+Precission=0.87, Recall=0.87{]}} are therefore more reliable.
+
+
+Training with 75\% of data. Selected PCA n\_components:
+    \texttt{'pca\_n\_components': 0.999, 'svc\_C': 100, 'svc\_gamma': 'scale', 'svc\_kernel': 'rbf'}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} & \textbf{Support} \\
+\midrule
+bus & 1.00 & 1.00 & 1.00 & 55 \\
+opel & 0.77 & 0.70 & 0.73 & 53 \\
+saab & 0.75 & 0.81 & 0.78 & 54 \\
+van & 0.96 & 0.96 & 0.96 & 50 \\
+\midrule
+\textbf{accuracy} &  &  & 0.87 & 212 \\
+\textbf{macro avg} & 0.87 & 0.87 & 0.87 & 212 \\
+\textbf{weighted avg} & 0.87 & 0.87 & 0.87 & 212 \\
+\bottomrule
+\end{tabular}
+\caption{Classification report for the SVM model on the Vehicle dataset.}
+\end{table}
+
+
+To address the feature correlation problem, the PCA method was used in
+the same pipeline setting for linear and rbf kernel models, with the
+performance metrics surprisingly being the same and also resulting for
+the same dataset size. Therefore PCA offered no advantage.
+
+Comparing the two best performing models (SVM, Logistic regression), by
+absolute effectiveness the SVM is superior, yet the complexity, as well
+as the loss of interpretability after the necessary PCA transformation
+justify the selection of Logistic Regression as the Best Model overall.
+
+\subsection{Other Models}
+\subsubsection{Random Forest}
+Random Forests were considered due to their robustness in handling
+high-dimensional data and their ability to model complex, nonlinear
+relationships while mitigating overfitting through ensemble averaging.
+
+Although multiple hyperparameter settings were tested {[}number of
+estimators, max depth, min samples split, min samples leaf, max
+features(sqrt, log2) and criterion(gini, entropy){]}, the computational
+load was too large for more exhaustive testing and the sampled
+effectiveness was underwhelming as well. The best found setup was
+\texttt{{[}gini, max depth=None, max features = sqrt, min samples
+leaf=1, mi samples split=5, n estimators=300{]}} which delivered
+\texttt{{[}Accuracy=0.76, Precission=0.76, Recall=0.76{]}}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} & \textbf{Support} \\
+\midrule
+bus & 0.90 & 0.98 & 0.94 & 65 \\
+opel & 0.64 & 0.45 & 0.53 & 64 \\
+saab & 0.56 & 0.65 & 0.60 & 65 \\
+van & 0.92 & 0.97 & 0.94 & 60 \\
+\midrule
+\textbf{accuracy} &  &  & 0.76 & 254 \\
+\textbf{macro avg} & 0.76 & 0.76 & 0.75 & 254 \\
+\textbf{weighted avg} & 0.75 & 0.76 & 0.75 & 254 \\
+\bottomrule
+\end{tabular}
+\caption{Classification report for the Random Forest model on the Vehicle dataset.}
+\end{table}
+
+
+\subsubsection{KNN}
+K-Nearest Neighbors model was selected due to its effectiveness in capturing 
+local structure without requiring extensive training or separation between features.
+
+For the hyperparameters, apart from the most important \text{number of
+neighbors}, different \textbf{weights} (uniform, distance), and
+\(L_{p}\) \textbf{norm} (p=1,2) were used. Further tests showed that
+there was no usable model with neighbors \textgreater{} 9. The best
+models had different setups depending on the split size, but more
+predominant was the number of neighbors = (4,5,6), the \(L_{1}\)norm and
+distance weights. Observing the plots, using the \(L_{1}\)norm in most
+cases yields better results but there is no clear better weight value;
+although models with distance weights seem to be more consistent I terms
+of CV score across runs.
+
+Once more, the end-point CV inaccuracy is apparent with the best
+predicted model per CV score being \texttt{{[}n neighbors=5, p=1,
+weights=distance{]}} trained on 95\% of the dataset. By searching all
+the test runs, the best model had actually different hyperparameter
+setting \texttt{{[}n neighbors=3, p=2, weights=uniform{]}} and was
+trained on 85\% of the dataset, resulting in \texttt{{[}Accuracy=0.73,
+Precision=0.74, Recall=0.73{]}}. These are quite satisfactory metrics
+considering the simplicity of the model (ca. 3 times more accurate than
+random guessing).
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Class} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} & \textbf{Support} \\
+\midrule
+bus & 0.97 & 0.97 & 0.97 & 33 \\
+opel & 0.52 & 0.38 & 0.44 & 32 \\
+saab & 0.53 & 0.72 & 0.61 & 32 \\
+van & 0.93 & 0.87 & 0.90 & 30 \\
+\midrule
+\textbf{accuracy} &  &  & 0.73 & 127 \\
+\textbf{macro avg} & 0.74 & 0.73 & 0.73 & 127 \\
+\textbf{weighted avg} & 0.74 & 0.73 & 0.73 & 127 \\
+\bottomrule
+\end{tabular}
+\caption{Classification report for the KNN model on the Vehicle dataset.}
+\end{table}
+
+
+In an effort to compress the sample space by exploiting the high
+cross-feature correlation, once again the PCA method was used in the
+same pipeline setting. In this case the CV prediction for the best model
+\texttt{{[}n neighbors=6, p=1, weights=distance, Var=0.998{]}} trained
+on 90\% of the dataset was closer to the actual recorded best
+\texttt{{[}n neighbors=7, p=1, weights=distance, Var=0.997{]}} trained
+on 85\%, which resulted in \texttt{{[}Accuracy=0.78, Precision=0.79,
+Recall=0.78{]}}, demonstrating a 5\% improvement in all metrics.
+
+The fitness of \(L_{1}\) as norm is more evident after the PCA
+application as well as the tendency of the model being more abstract due
+to the larger overall k (= n neighbors).
+
 \subsection{Summary}
 
-\section{Data Set 3}
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Model} & \textbf{Accuracy (CV)} & \textbf{Precision / Recall (approx.)} \\
+\midrule
+Logistic Regression & 0.85 & 0.85 / 0.85 \\
+SVM (RBF kernel)    & 0.87 & 0.87 / 0.87 \\
+Random Forest        & 0.76 & 0.76 / 0.76 \\
+KNN                  & 0.78 & 0.79 / 0.78 \\
+\bottomrule
+\end{tabular}
+\caption{Performance summary for the Vehicle dataset (best SVM with RBF kernel).}
+\end{table}
+
+
+While the process is computationally intensive, it remains
+non-exhaustive, leaving room for untested hyperparameter and data split
+combinations that may yield superior model performance. Nonetheless, the
+use of multiple train/test size configurations enables the estimation of
+statistical upper and lower bounds for model effectiveness.
+
+% ------------------------------------------------------------------------
+
+\section{Dataset 3: Congressional Voting}
+
+\cite{KaggleCongressionalVoting2025}
+
 \subsection{Overview}
+
+The training set is composed of 218 observations and 17 categorical
+variables. Each variable refers to a specific topic discussed during
+congressional voting, and it takes the value \emph{\texttt{y}} if the
+representative voted in favour and \emph{\texttt{n}} otherwise.
+
+Our goal is to predict the variable \texttt{class}, which takes two
+values: \texttt{republican} and \texttt{democrat}, using an
+appropriate classification model. The model is trained on the training
+dataset, compared with other classifiers, and then evaluated using
+performance measures. To select the best model, we applied a 10-fold
+cross-validation and chose the classifier with the highest accuracy,
+while also considering its interpretability. Finally, we used the
+selected model to predict the response variable on the test set and
+submitted the results to the Kaggle platform.
+
 \subsection{Pre-processing}
-\subsection{Algorithm 1}
-\subsection{Algorithm 2}
-\subsection{Algorithm 3}
+
+\begin{describe}
+\item[Missing Values]After loading the training data and looking up to its structure, we
+notice that several variables contain missing values. Dropping all rows
+with missing data would reduce the dataset by more than 50\%, so we
+decide to impute the missing values. For such reason, we use logistic
+regression to predict the missing values of each variable, treating them
+as unknown outcomes and using all the other variables \emph{(except the
+real target class)} as predictors. After fitting 16 logistic regression
+models and imputing the missing values, the training dataset is
+complete.
+\end{describe}
+
+imputer = IterativeImputer(estimator=LogisticRegression(), max\_iter=10,
+random\_state=0)
+
+To explore the relationship between the response variable and each
+predictor, we create two-way contingency tables. Below is the table for
+the variable \texttt{\textbf{\emph{physician-fee-freeze}}}, which
+shows an almost perfect separation between the two classes.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{physician-fee-freeze} & \textbf{democrat} & \textbf{republican} \\
+\midrule
+False & 122 & 3 \\
+True  & 5   & 88 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+This suggests that this variable will likely play an important role in
+the following models.
+
+\subsection{Model 1: Logistic Regression}
+Our first classifier is a logistic regression model that uses all the
+predictors. By the function ``\emph{LogisticRegression''} from
+the''\emph{sklearn.linear\_model''} package, we model the probability of
+voting \texttt{republican} given the set of explanatory variables. In
+the table below, the column ``\emph{Coefficient}'', referring to the
+full logistic model, shows the direction of the effect (positive or
+negative) and its magnitude in terms of log-odds ratio. As expected, a
+positive and huge effect on the probability to vote
+\texttt{republican} is due to the variable \texttt{physician-fee-freeze}.
+
+\paragraph{Cross Validation}
+As discussed earlier, we evaluate the performance of our model using
+10-fold cross-validation. This method consists of randomly splitting the
+training set into ten parts, using one fold as the validation set and
+fitting the model on the remaining nine. The procedure is repeated ten
+times, and the final accuracy is obtained by averaging the results
+across all folds. Using the ``\emph{Kfold}'' function from the
+``\emph{sklearn.model\_selection''} package, we obtain a
+cross-validation accuracy of \texttt{0.9677} for the full logistic
+regression model. Although this is a very good result, using all the
+features may lead to overfitting and reduces the interpretability of the
+model.
+
+For this reason, the next step is to force some of the coefficient
+estimates to be exactly zero by applying an \emph{L1} penalty. In lasso
+regression, the tuning parameter lambda controls the strength of the
+penalty: the larger the value of lambda, the stronger the shrinkage
+applied to the coefficients. The optimal value of lambda can be selected
+through 10-fold cross-validation by choosing the value that achieves the
+lowest prediction error. In our case, we create an equally spaced
+sequence of 30 values on a log10 scale to search for the best parameter.
+In our code, C is the inverse of lambda and at the end, we find its
+optimal value equal to \textbf{2.593}. Looking at the column
+\texttt{Coefficien penalized}, we can notice that most features no
+longer have a direct effect on the response variable, and even the most
+important predictors show a strong reduction in their coefficient
+values. The cross validation accuracy for the penalized model is
+\textbf{0.963}. Although this value is slightly lower than the accuracy
+of the full model, we prefer the penalized version because it is more
+interpretable and has more degrees of freedom, since fewer coefficients
+need to be estimated.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{r l r r}
+\hline
+\textbf{No.} & \textbf{Feature} & \textbf{Coefficient} & \textbf{Coef. penalized} \\
+\hline
+0  & intercept & 3.139287 & 0.000000 \\
+1  & physician-fee-freeze & 78.985866 & 7.616169 \\
+2  & religious-groups-in-schools & -39.341032 & -1.039915 \\
+3  & synfuels-crporation-cutback & -36.084802 & -3.548138 \\
+4  & el-salvador-aid & 29.953863 & 0.000000 \\
+5  & adoption-of-the-budget-resolution & -23.591818 & -2.313113 \\
+6  & mx-missile & -21.747931 & -2.370776 \\
+7  & water-project-cost-sharing & -20.466584 & -1.969317 \\
+8  & anti-satellite-test-ban & 17.734831 & 0.648073 \\
+9  & handicapped-infants & 13.394403 & 0.525151 \\
+10 & education-spending & -11.618886 & 0.000000 \\
+11 & export-administration-act-south-africa & 7.910343 & 1.161229 \\
+12 & aid-to-nicaraguan-contras & -6.469110 & 0.000000 \\
+13 & duty-free-exports & 6.451421 & -1.009904 \\
+14 & crime & -5.954267 & 0.113905 \\
+15 & superfund-right-to-sue & 1.790300 & 0.000000 \\
+16 & immigration & 0.981784 & 0.167732 \\
+\hline
+\end{tabular}
+\caption{Comparison of full and penalized logistic regression coefficients, sorted by absolute coefficient magnitude.}
+\label{tab:coefficients_abs_sorted}
+\end{table}
+
+\subsection{Model 2: Classification Tree}
+
+As last classifier, we fit a decision tree by using the function
+\texttt{DecisionTreeClassifier} function, which allows us to specify
+the splitting criterion. In our case, we use entropy as the node
+impurity measure. The higher the entropy, the lower the information
+gained from a given split, so the algorithm prefers splits with the
+smallest possible entropy. The binary splitting process continues until
+the stopping rule is reached: a terminal node (leaf) must be pure,
+meaning it contains only observations belonging to the same class. The
+resulting tree is very large and consists of nineteen pure terminal
+nodes, which suggests that the model is overfitting the training data.
+To reduce overfitting and improve generalization, we prune the tree to
+obtain a smaller and more interpretable model for predicting the test
+set. The idea is similar to tuning the penalty parameter in lasso
+regression. Here, we select the best alpha value \emph{(the
+cost-complexity pruning parameter}) through cross-validation. The alpha
+value that maximizes the accuracy among the tested values is
+\textbf{0}.\textbf{0258}. The resulting pruned tree has the first split
+done by the variable \texttt{physician-fee-freeze}, which we have
+already considered as the most important to predict the vote, and then a
+less weight is given to the variable of the second split, i.e.
+\texttt{synfuels-crporation-cutback}. At the end, we calculate its
+10-fold cross validation accuracy, which is equal to \textbf{0.9628.}
+
+ccp\_path = tree.cost\_complexity\_pruning\_path(X, y)
+
+grid\_tree = GridSearchCV(tree, \{'ccp\_alpha': ccp\_path.ccp\_alphas\},
+
+~ ~ ~ ~ ~ ~ ~ ~ ~ ~ refit=True, cv=cv, scoring='accuracy').fit(X, y)
+
+\includegraphics[width=0.7\textwidth]{img/congress_tree}
+
+\subsection{Other Models}
+\subsubsection{Naïve Bayes}
+At this stage, we change the type of algorithm and implement a naïve
+Bayes classifier. Since our attributes are binary and assumed to be
+statistically independent and equally important, we use the
+``\emph{BernoulliNB''} function to fit the model. After examining the
+log prior probabilities and the empirical log probabilities of the
+features given each class, we perform a cross-validation to evaluate the
+predictive performance. Because of the simplicity of the model and the
+fact that some of its assumptions are not fully satisfied, the
+prediction accuracy is the lowest so far: \textbf{0.9121}.
+
 \subsection{Summary}
 
-\section{Data Set 4}
+\begin{table}[H]
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Model} & \textbf{Accuracy (CV)} & \textbf{Notes} \\
+\midrule
+Logistic Regression (full)   & 0.9677 & Slightly overfitted \\
+Logistic Regression (L1)     & 0.9630 & Preferred for interpretability \\
+Decision Tree (pruned)       & 0.9628 & Best overall by CV \\
+Naïve Bayes                  & 0.9121 & Simplest, lowest accuracy \\
+\bottomrule
+\end{tabular}
+\caption{Cross-validation accuracy results for the Congressional Voting dataset.}
+\end{table}
+
+For interpretability and best accuracy, we choose the lasso regression
+and the pruned tree as best models to predict an unknown test set. After
+loading it, the next step is to impute its missing value from the models
+fitted in the training set. Submitting the two predictions in the
+\emph{Kaggle} competition, the lasso model has a test accuracy
+approximately of 0.95370, while the pruned tree achieves a slightly
+better result of \textbf{0.96296}.
+
+% ------------------------------------------------------------------------
+
+\section{Dataset 4: Amazon reviews}
+Our fourth dataset also comes from Kaggle and is the ``Reviews'' dataset\cite{KaggleReviews2025},
+which contains data about amazon reviews and their authors. Because the features aren't labelled
+we don't know what they stood for exactly - but they are likely characteristics found in written
+reviews like style or the use of certain words.
+
+The task of this competition was to predict the \textbf{author of a review} based on
+numerical features extracted from Amazon review texts. The target variable (\texttt{Class})
+contained usernames, and the task was formulated as a multi-class classification problem.
+
 \subsection{Overview}
+
+The training dataset has 750 and 10.002 columns which makes it a very wide data set. All data
+is already vectorized and possibly output from a preprocessing step that transformed text into
+numerical features for machine learning. \emph{The whole dataset consists of integers.} They
+could be counts, categories or ordinal variables. This raises the issue that we don't know when
+2 is supposed to be ``twice as good'' as 1 (ordinal).
+
+To get a better sense of their type, we looked at the number of unique values:
+
+\includegraphics[width=0.9\textwidth]{img/reviews_uniqueValues}
+
+The majority of features have only a few distinct values. More than 3.000 features are
+binary (two unique values), and over 2.000 have only three unique values. This suggests that
+the dataset primarily consists of discrete or categorical-like integer features, rather
+than continuous numeric ones.
+
+The target variable can take 50 different values in total, but it is relatively well-balanced
+across the dataset:
+
+\includegraphics[width=\textwidth]{img/reviews_perAuthor}
+
 \subsection{Pre-processing}
-\subsection{Algorithm 1}
-\subsection{Algorithm 2}
-\subsection{Algorithm 3}
+
+\begin{description}
+    \item[Label Endcoding:]The author names were label-encoded into integer values using \texttt{LabelEncoder}.
+    \item[Basic Sanity Check:] We checked for missing values, duplicate rows and constant columns, but the
+    dataset is clean and didn't have any of those.
+    \item[Downcasting:] Since all of our values are rather small integers we can save a lot of memory
+    by casting their current dtype \texttt{int64} down to \texttt{int8}. By doing so
+    we reduced memory from 57.27 MB to 7.20 MB (87.4\% reduction).
+    \item[Categorize Data:] After our investigation of the data reviled how many columns appear to be
+    binary data, we categorized them as ``binary'' (2 unique values), ``categorical'' (2-10 unique values) and
+    ``continuous'' (more than 10 unique values), to be able to treat them differently later.
+    \item[Reduce number of features:] We used \texttt{TruncatedSVD}, which is a build in function that applies PCR
+    to reduce the number of features from 10.000 to the 300 most important ones.
+\end{description}
+
+\subsection{Model 1: Logistic Regression}
+
+Relevant parameters: \texttt{penalty=\("elasticnet"\), l1\_ratio=0.7, C=0.5, max\_iter=3000}
+\texttt{penalty=\("elasticnet"\), l1\_ratio=0.5, C=5, max\_iter=1000}
+
+\subsection{Model 2: Decision Tree}
+
+Relevant parameters: \texttt{criterion=\("gini"\), max\_depth=20, min\_samples\_split=10, min\_samples\_leaf=5}
+
+\subsection{Model 3: SVM}
+
+Relevant parameters: \texttt{kernel=\("rbf"\), C=2.0, gamma=\("scale"\)}
+
 \subsection{Summary}
+For this dataset, the \textbf{RandomForest classifier} demonstrated the most effective balance between accuracy, robustness, and interpretability.
+It achieved a cross-validated \textbf{macro-F1 of 0.678} and \textbf{accuracy of 0.704}, outperforming all other tested models.
+Future tuning and ensemble approaches are expected to yield incremental gains in classification performance.
+\section{Summary}\label{sec:final_summary}
 
-\section{Summary}
+\begin{table}[H]
+\centering
+\begin{tabular}{llcc}
+\toprule
+\textbf{Dataset} & \textbf{Model} & \textbf{CV Accuracy} & \textbf{Macro F1} \\
+\midrule
+Credit Score & Logistic Regression & 0.970 $\pm$ 0.024 & 0.964 $\pm$ 0.030 \\
+Credit Score & Decision Tree        & 0.980 $\pm$ 0.024 & 0.976 $\pm$ 0.029 \\
+Credit Score & SVM                  & 0.880 $\pm$ 0.050 & 0.860 $\pm$ 0.060 \\
+\midrule
+Vehicle      & Logistic Regression  & 0.850 & 0.850 \\
+Vehicle      & SVM (RBF)            & 0.870 & 0.870 \\
+Vehicle      & Random Forest        & 0.760 & 0.760 \\
+Vehicle      & KNN (PCA)            & 0.780 & 0.780 \\
+Vehicle & Decision Tree & 0.700 & 0.710 \\
+\midrule
+Congressional Voting & Logistic Regression (L1) & 0.963 & -- \\
+Congressional Voting & Decision Tree (pruned)   & 0.963 & -- \\
+Congressional Voting & Naïve Bayes              & 0.912 & -- \\
+\midrule
+Amazon Reviews & Random Forest      & 0.704 & 0.678 \\
+Amazon Reviews & SGD (ElasticNet)   & 0.685 & 0.653 \\
+Amazon Reviews & LightGBM           & 0.543 & 0.505 \\
+\bottomrule
+\end{tabular}
+\caption{Cross-validation results across datasets and models}
+\end{table}
 
+\noindent
+Across all four datasets, the three selected classifiers (Logistic Regression, Decision Tree, and SVM) demonstrated complementary strengths that highlight the trade-offs between interpretability, flexibility, and generalization.
+
+For the \textbf{Credit Score dataset}, both Logistic Regression and the Decision Tree achieved near-perfect performance
+(\texttt{CV\_Accuracy} $\approx$ 0.97--0.98), with the latter slightly higher but prone to overfitting due to small sample size and a dominant predictor. The SVM achieved lower yet stable performance (0.88), indicating better regularization and generalization potential.
+
+In the \textbf{Vehicle dataset}, where the feature space was larger and multicollinear, Logistic Regression and SVM remained robust (0.85--0.87),
+whereas tree-based and instance-based models (Random Forest, KNN) underperformed, especially without dimensionality reduction.
+PCA modestly improved KNN results by $\approx$ 5\%, but interpretability was lost.
+
+For the \textbf{Congressional Voting dataset}, all models performed exceptionally well, with Logistic Regression (L1) and the pruned Decision Tree both exceeding \texttt{CV\_Accuracy} = 0.96.
+Despite marginally lower accuracy, the penalized Logistic Regression was preferred due to its stability and interpretability.
+Naïve Bayes, although conceptually appropriate, lagged behind at 0.91.
+
+Finally, in the \textbf{Amazon Reviews dataset}, characterized by extreme feature dimensionality (10,002 predictors for 750 samples), ensemble and regularized models dominated.
+The Random Forest achieved the highest performance (\texttt{CV\_Accuracy} = 0.704, \texttt{Macro-F1} = 0.678), confirming its suitability for wide, sparse, and potentially noisy data.
+The ElasticNet-based SGD model performed competitively (0.685 / 0.653), suggesting that linear methods still retain value even in high-dimensional settings when properly regularized.
+
+Overall, the Decision Tree and Random Forest models tended to overfit small or unbalanced datasets, while Logistic Regression and SVM offered more consistent generalization across diverse feature structures.
+This emphasizes that no single model is universally optimal; instead, robustness and interpretability vary with dataset size, balance, and dimensionality.
 
 \printbibliography
 \end{document}

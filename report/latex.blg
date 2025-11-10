@@ -1,0 +1,5 @@
+[0] Config.pm:328> INFO - This is Biber 2.21
+[0] Config.pm:331> INFO - Logfile is 'latex.blg'
+[235] biber-MSWIN64:342> INFO - === 
+[1381] Utils.pm:479> ERROR - Cannot find 'latex.bcf'!
+[1381] Biber.pm:137> INFO - ERRORS: 1
